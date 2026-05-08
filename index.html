@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>simpledeck.lol</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <main class="app">
     <section class="left-column">
@@ -13,53 +15,55 @@
         <h1>simpledeck.lol</h1>
       </div>
 
-      <div class="controls" aria-label="Decklist controls">
+      <div class="controls" aria-label="Decklist controls" autocomplete="off">
         <fieldset>
           <legend>Info Box</legend>
 
-          <label>Title
-            <input id="deckTitle" value="Boom Boom Groove &amp; Do The Wave :)" maxlength="60" />
+          <label data-field-control="deckTitle">Title
+            <input id="deckTitle" maxlength="60"
+              placeholder="Title your deck!" autocomplete="off" />
           </label>
 
-          <label>Player Name
-            <input id="playerName" value="John Lastname" maxlength="60" />
+          <label data-field-control="playerName">Player Name
+            <input id="playerName" value="John Lastname" maxlength="60" placeholder="What is your name?" autocomplete="off" />
           </label>
 
-          <label>Player ID
-            <input id="playerId" value="1234567" maxlength="20" />
+          <label data-field-control="playerId">Player ID
+            <input id="playerId" maxlength="20" placeholder="Pokemon Play ID" autocomplete="off" />
           </label>
 
-          <label>Event
-            <input id="eventName" value="Great Lakes Gaming Wooper Wednesday" maxlength="60" />
+          <label data-field-control="eventName">Event
+            <input id="eventName" maxlength="60"
+              placeholder="Where are you competing?" autocomplete="off" />
           </label>
 
           <div class="row">
-            <label>Date
-              <input id="date" value="05/01/2026" maxlength="20" />
+            <label data-field-control="date">Date
+              <input id="date" maxlength="20" placeholder="List create date" autocomplete="off" />
             </label>
 
-            <label>Competition Date
-              <input id="competitionDate" value="05/13/2026" maxlength="20" />
+            <label data-field-control="competitionDate">Competition Date
+              <input id="competitionDate" maxlength="20" placeholder="Event date" autocomplete="off" />
             </label>
           </div>
 
-          <label>Country
-            <input id="country" value="USA" />
+          <label data-field-control="country">Country
+            <input id="country" value="USA" placeholder="Where are you from?" autocomplete="off" />
           </label>
 
-          <label>Deck Archetype
-            <input id="deckArchetype" value="Festival Lead" maxlength="60" />
+          <label data-field-control="deckArchetype">Deck Archetype
+            <input id="deckArchetype" maxlength="60" placeholder="Archetype / Variant" autocomplete="off" />
           </label>
 
           <div class="checks" aria-label="Visible info fields">
-            <label><input type="checkbox" class="field-toggle" data-field="deckTitle" checked /> Title</label>
-            <label><input type="checkbox" class="field-toggle" data-field="playerName" checked /> Player</label>
-            <label><input type="checkbox" class="field-toggle" data-field="playerId" checked /> Player ID</label>
-            <label><input type="checkbox" class="field-toggle" data-field="eventName" checked /> Event</label>
-            <label><input type="checkbox" class="field-toggle" data-field="date" checked /> Date</label>
-            <label><input type="checkbox" class="field-toggle" data-field="competitionDate" /> Competition</label>
-            <label><input type="checkbox" class="field-toggle" data-field="country" /> Country</label>
-            <label><input type="checkbox" class="field-toggle" data-field="deckArchetype" /> Archetype</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="deckTitle" checked /> Title</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="playerName" checked /> Player</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="playerId" checked /> Player ID</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="eventName" checked /> Event</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="date" checked /> Date</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="competitionDate" /> Competition</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="country" /> Country</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="deckArchetype" /> Archetype</label>
           </div>
         </fieldset>
 
@@ -67,7 +71,7 @@
           <legend>Decklist</legend>
 
           <label>Paste card list
-            <textarea id="deckInput">Pokémon: 10
+            <textarea id="deckInput" autocomplete="off" placeholder="Paste in your decklist using PTCGL formatting.">Pokémon: 10
 3 Thwackey TWM 15
 4 Dipplin TWM 18
 4 Applin SCR 12
@@ -122,16 +126,26 @@ Total Cards: 60</textarea>
         </div>
 
         <div class="color-row" aria-label="Preview background color">
-          <button type="button" class="color-swatch active" data-color="#0b0b0b" style="--swatch-color:#0b0b0b" title="Default"></button>
-          <button type="button" class="color-swatch" data-color="#00451b" style="--swatch-color:#00451b" title="Grass"></button>
-          <button type="button" class="color-swatch" data-color="#5a0c06" style="--swatch-color:#5a0c06" title="Fire"></button>
-          <button type="button" class="color-swatch" data-color="#00275f" style="--swatch-color:#00275f" title="Water"></button>
-          <button type="button" class="color-swatch" data-color="#5a4500" style="--swatch-color:#5a4500" title="Electric"></button>
-          <button type="button" class="color-swatch" data-color="#3f0960" style="--swatch-color:#3f0960" title="Psychic"></button>
-          <button type="button" class="color-swatch" data-color="#4a2608" style="--swatch-color:#4a2608" title="Fighting"></button>
-          <button type="button" class="color-swatch" data-color="#050811" style="--swatch-color:#050811" title="Dark"></button>
-          <button type="button" class="color-swatch" data-color="#454850" style="--swatch-color:#454850" title="Steel"></button>
-          <button type="button" class="color-swatch" data-color="#403713" style="--swatch-color:#403713" title="Dragon"></button>
+          <button type="button" class="color-swatch active" data-color="#0b0b0b" style="--swatch-color:#0b0b0b"
+            title="Default"></button>
+          <button type="button" class="color-swatch" data-color="#00451b" style="--swatch-color:#00451b"
+            title="Grass"></button>
+          <button type="button" class="color-swatch" data-color="#5a0c06" style="--swatch-color:#5a0c06"
+            title="Fire"></button>
+          <button type="button" class="color-swatch" data-color="#00275f" style="--swatch-color:#00275f"
+            title="Water"></button>
+          <button type="button" class="color-swatch" data-color="#5a4500" style="--swatch-color:#5a4500"
+            title="Electric"></button>
+          <button type="button" class="color-swatch" data-color="#3f0960" style="--swatch-color:#3f0960"
+            title="Psychic"></button>
+          <button type="button" class="color-swatch" data-color="#4a2608" style="--swatch-color:#4a2608"
+            title="Fighting"></button>
+          <button type="button" class="color-swatch" data-color="#050811" style="--swatch-color:#050811"
+            title="Dark"></button>
+          <button type="button" class="color-swatch" data-color="#454850" style="--swatch-color:#454850"
+            title="Steel"></button>
+          <button type="button" class="color-swatch" data-color="#403713" style="--swatch-color:#403713"
+            title="Dragon"></button>
         </div>
 
         <div class="number-row" aria-label="Background style">
@@ -161,4 +175,5 @@ Total Cards: 60</textarea>
 
   <script src="script.js"></script>
 </body>
+
 </html>
