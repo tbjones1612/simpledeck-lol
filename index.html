@@ -21,7 +21,7 @@
 
           <label data-field-control="deckTitle">Title
             <input id="deckTitle" maxlength="60"
-              placeholder="Title your deck!" autocomplete="off" />
+              placeholder="Title your deck!" value="Boom Boom Groovin" autocomplete="off" />
           </label>
 
           <label data-field-control="playerName">Player Name
@@ -29,12 +29,12 @@
           </label>
 
           <label data-field-control="playerId">Player ID
-            <input id="playerId" maxlength="20" placeholder="Pokemon Play ID" autocomplete="off" />
+            <input id="playerId" maxlength="20" placeholder="Pokemon Play ID" value="1234567" autocomplete="off" />
           </label>
 
           <label data-field-control="eventName">Event
             <input id="eventName" maxlength="60"
-              placeholder="Where are you competing?" autocomplete="off" />
+              placeholder="Where are you competing?" value="Great Lakes Gaming Wooper Wednesday" autocomplete="off" />
           </label>
 
           <div class="row">
@@ -60,8 +60,8 @@
             <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="playerName" checked /> Player</label>
             <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="playerId" checked /> Player ID</label>
             <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="eventName" checked /> Event</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="date" checked /> Date</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="competitionDate" /> Competition</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="date" />List Date</label>
+            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="competitionDate" /> Event Date</label>
             <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="country" /> Country</label>
             <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="deckArchetype" /> Archetype</label>
           </div>
@@ -107,11 +107,11 @@ Total Cards: 60</textarea>
 
           <div class="row">
             <label>Border Character
-              <input id="borderChar" value="#" maxlength="1" />
+              <input id="borderChar" value="#" maxlength="1"  autocomplete="off" />
             </label>
 
             <label>Paper Width
-              <select id="paperWidth">
+              <select id="paperWidth" autocomplete="off" >
                 <option value="92" selected>92 characters</option>
                 <option value="86">86 characters</option>
                 <option value="100">100 characters</option>

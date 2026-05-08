@@ -3,8 +3,8 @@ const fields = {
   playerName: { label: "Player Name", el: document.getElementById("playerName") },
   playerId: { label: "Player ID", el: document.getElementById("playerId") },
   eventName: { label: "Event", el: document.getElementById("eventName") },
-  date: { label: "Date", el: document.getElementById("date") },
-  competitionDate: { label: "Competition Date", el: document.getElementById("competitionDate") },
+  date: { label: "List Date", el: document.getElementById("date") },
+  competitionDate: { label: "Event Date", el: document.getElementById("competitionDate") },
   country: { label: "Country", el: document.getElementById("country") },
   deckArchetype: { label: "Deck Archetype", el: document.getElementById("deckArchetype") }
 };
