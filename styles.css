@@ -1,0 +1,323 @@
+:root {
+      --bg: #070707;
+      --panel: #101010;
+      --panel-2: #050505;
+      --text: #f4f4f4;
+      --muted: #bdbdbd;
+      --line: #777777;
+      --accent: #eeeeee;
+      --danger: #ffb3b3;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(320px, 440px) minmax(600px, 1fr);
+      gap: 24px;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .left-column {
+      height: fit-content;
+      position: sticky;
+      top: 24px;
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      border-radius: 10px;
+      height: fit-content;
+    }
+
+    h1 {
+      font-size: 15px;
+      margin: 0;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    fieldset {
+      border: 1px solid var(--line);
+      margin: 0 0 16px;
+      padding: 14px;
+      border-radius: 8px;
+    }
+
+    legend {
+      padding: 0 8px;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      margin-top: 5px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin-top: 8px;
+    }
+
+    .checks label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .checks input {
+      width: auto;
+      margin: 0;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      cursor: pointer;
+      border: 1px solid var(--accent);
+      background: var(--text);
+      color: #111111;
+      font: inherit;
+      font-size: 15px;
+      padding: 11px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+    }
+
+    .color-row {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .color-swatch {
+      width: 100%;
+      aspect-ratio: 1;
+      min-height: 24px;
+      border: 1px solid #444444;
+      border-radius: 4px;
+      padding: 0;
+      background: var(--swatch-color);
+    }
+
+    .color-swatch.active {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+    }
+
+    .number-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .number-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      border: 1px solid #444444;
+      border-radius: 4px;
+      color: var(--text);
+      background: var(--panel-2);
+      font-size: 13px;
+      padding: 6px 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .number-box.active {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+    }
+
+    .warning {
+      color: var(--danger);
+      font-size: 14px;
+      line-height: 1.4;
+      min-height: 18px;
+      margin-top: 12px;
+    }
+
+    .preview-wrap {
+      min-width: 0;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .preview-header h2 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .total {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .page-shell {
+      overflow: auto;
+      padding: 16px;
+      background: #050505;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    #printPage {
+      position: relative;
+      display: inline-block;
+      padding: 34px 38px;
+      background-color: var(--preview-base, #0b0b0b);
+      background-image: var(--preview-overlay, none);
+      background-repeat: var(--preview-repeat, no-repeat);
+      background-position: var(--preview-position, center);
+      background-size: var(--preview-size, cover);
+      color: #f5f5f5;
+      border: 1px solid #333333;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.35);
+    }
+
+    #asciiPreview {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 16px;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+      white-space: pre;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .left-column {
+        position: static;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+
+      .left-column,
+      .preview-header {
+        display: none !important;
+      }
+
+      .app {
+        display: block;
+        padding: 0;
+      }
+
+      .preview-wrap,
+      .page-shell {
+        display: block;
+        padding: 0;
+        margin: 0;
+        border: none;
+        background: #ffffff !important;
+        overflow: visible;
+      }
+
+      #printPage {
+        padding: 0;
+        margin: 0;
+        border: none;
+        box-shadow: none;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+
+      #asciiPreview {
+        color: #000000 !important;
+        font-size: 12pt;
+        line-height: 1.28;
+      }
+
+      @page {
+        size: letter portrait;
+        margin: 0.45in;
+      }
+    }

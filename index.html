@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simpledeck.lol</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="left-column">
+      <div class="preview-header">
+        <h1>simpledeck.lol</h1>
+      </div>
+
+      <div class="controls" aria-label="Decklist controls">
+        <fieldset>
+          <legend>Info Box</legend>
+
+          <label>Title
+            <input id="deckTitle" value="Boom Boom Groove &amp; Do The Wave :)" maxlength="60" />
+          </label>
+
+          <label>Player Name
+            <input id="playerName" value="John Lastname" maxlength="60" />
+          </label>
+
+          <label>Player ID
+            <input id="playerId" value="1234567" maxlength="20" />
+          </label>
+
+          <label>Event
+            <input id="eventName" value="Great Lakes Gaming Wooper Wednesday" maxlength="60" />
+          </label>
+
+          <div class="row">
+            <label>Date
+              <input id="date" value="05/01/2026" maxlength="20" />
+            </label>
+
+            <label>Competition Date
+              <input id="competitionDate" value="05/13/2026" maxlength="20" />
+            </label>
+          </div>
+
+          <label>Country
+            <input id="country" value="USA" />
+          </label>
+
+          <label>Deck Archetype
+            <input id="deckArchetype" value="Festival Lead" maxlength="60" />
+          </label>
+
+          <div class="checks" aria-label="Visible info fields">
+            <label><input type="checkbox" class="field-toggle" data-field="deckTitle" checked /> Title</label>
+            <label><input type="checkbox" class="field-toggle" data-field="playerName" checked /> Player</label>
+            <label><input type="checkbox" class="field-toggle" data-field="playerId" checked /> Player ID</label>
+            <label><input type="checkbox" class="field-toggle" data-field="eventName" checked /> Event</label>
+            <label><input type="checkbox" class="field-toggle" data-field="date" checked /> Date</label>
+            <label><input type="checkbox" class="field-toggle" data-field="competitionDate" checked /> Competition</label>
+            <label><input type="checkbox" class="field-toggle" data-field="country" /> Country</label>
+            <label><input type="checkbox" class="field-toggle" data-field="deckArchetype" /> Archetype</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Decklist</legend>
+
+          <label>Paste card list
+            <textarea id="deckInput">Pokémon: 10
+3 Thwackey TWM 15
+4 Dipplin TWM 18
+4 Applin SCR 12
+3 Grookey TWM 14
+2 Goldeen TWM 44
+1 Rillaboom TWM 16
+1 Rellor TEF 23
+1 Seaking PRE 21
+1 Rabsca TEF 24
+1 Psyduck ASC 39
+
+Trainer: 14
+3 Bug Catching Set TWM 143
+4 Festival Grounds TWM 149
+2 Black Belt's Training JTG 143
+1 Maximum Belt TEF 154
+4 Poké Pad ASC 198
+2 Night Stretcher ASC 196
+1 Sacred Ash DRI 168
+2 Hilda WHT 84
+2 Judge DRI 167
+3 Buddy-Buddy Poffin ASC 184
+2 Brave Bangle WHT 80
+3 Lillie's Determination MEG 119
+3 Boss's Orders ASC 183
+1 Air Balloon ASC 181
+
+Energy: 1
+6 Basic {G} Energy MEE 1
+
+Total Cards: 60</textarea>
+          </label>
+
+          <div class="row">
+            <label>Border Character
+              <input id="borderChar" value="#" maxlength="1" />
+            </label>
+
+            <label>Paper Width
+              <select id="paperWidth">
+                <option value="92" selected>92 characters</option>
+                <option value="86">86 characters</option>
+                <option value="100">100 characters</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="buttons">
+          <button id="printBtn">Print to PDF</button>
+          <button id="saveBtn" class="secondary">Save Image</button>
+        </div>
+
+        <div class="color-row" aria-label="Preview background color">
+          <button type="button" class="color-swatch active" data-color="#0b0b0b" style="--swatch-color:#0b0b0b" title="Default"></button>
+          <button type="button" class="color-swatch" data-color="#00451b" style="--swatch-color:#00451b" title="Grass"></button>
+          <button type="button" class="color-swatch" data-color="#5a0c06" style="--swatch-color:#5a0c06" title="Fire"></button>
+          <button type="button" class="color-swatch" data-color="#00275f" style="--swatch-color:#00275f" title="Water"></button>
+          <button type="button" class="color-swatch" data-color="#5a4500" style="--swatch-color:#5a4500" title="Electric"></button>
+          <button type="button" class="color-swatch" data-color="#3f0960" style="--swatch-color:#3f0960" title="Psychic"></button>
+          <button type="button" class="color-swatch" data-color="#4a2608" style="--swatch-color:#4a2608" title="Fighting"></button>
+          <button type="button" class="color-swatch" data-color="#050811" style="--swatch-color:#050811" title="Dark"></button>
+          <button type="button" class="color-swatch" data-color="#454850" style="--swatch-color:#454850" title="Steel"></button>
+          <button type="button" class="color-swatch" data-color="#403713" style="--swatch-color:#403713" title="Dragon"></button>
+        </div>
+
+        <div class="number-row" aria-label="Background style">
+          <button type="button" class="number-box active" data-style="default">Default</button>
+          <button type="button" class="number-box" data-style="lines">Lines</button>
+          <button type="button" class="number-box" data-style="gradient">Gradient</button>
+          <button type="button" class="number-box" data-style="ball">Ball</button>
+        </div>
+
+        <div id="warning" class="warning" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="preview-wrap" aria-label="Live preview">
+      <div class="preview-header">
+        <h2>Live Preview</h2>
+        <div id="total" class="total"></div>
+      </div>
+
+      <div class="page-shell">
+        <div id="printPage">
+          <pre id="asciiPreview"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
