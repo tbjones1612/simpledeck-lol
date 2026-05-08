@@ -43,7 +43,7 @@ function parseDeck(text) {
   const sectionHeaderPattern = new RegExp("^ *(pok[eé]mon|pokemon|trainer|trainers|energy) *: *[0-9]* *$", "i");
   const sectionNamePattern = new RegExp("^ *(pok[eé]mon|pokemon|trainer|trainers|energy) *:", "i");
   const totalCardsPattern = new RegExp("^ *total +cards *: *[0-9]+ *$", "i");
-  const cardWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z]{3}) +[0-9]+ *$");
+  const cardWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z]{3}) +([0-9]+) *$");
   const basicCardPattern = new RegExp("^([0-9]+) +(.+)$");
 
   const sections = {
@@ -87,7 +87,9 @@ function parseDeck(text) {
           qty: Number(setMatch[1]),
           qtyText: setMatch[1],
           name: setMatch[2].trim(),
-          setCode: setMatch[3]
+          setCode: setMatch[3] + " " + setMatch[4],
+          setAbbrev: setMatch[3],
+          setNumber: setMatch[4]
         });
         return;
       }
@@ -98,7 +100,9 @@ function parseDeck(text) {
           qty: Number(basicMatch[1]),
           qtyText: basicMatch[1],
           name: basicMatch[2].trim(),
-          setCode: ""
+          setCode: "",
+          setAbbrev: "",
+          setNumber: ""
         });
         return;
       }
@@ -107,7 +111,9 @@ function parseDeck(text) {
         qty: 1,
         qtyText: "1",
         name: line,
-        setCode: ""
+        setCode: "",
+        setAbbrev: "",
+        setNumber: ""
       });
     });
 
@@ -218,14 +224,33 @@ function makeSection(title, cards, columnWidth) {
     const setCode = card.setCode || "";
 
     if (setCode) {
-      const firstLineNameWidth = columnWidth - qtyPart.length - setCode.length - 1;
-      const wrapped = wrapWords(card.name, firstLineNameWidth);
+      if (title.toLowerCase() === "energy") {
+        const wrapped = wrapWords(card.name, columnWidth - qtyPart.length);
 
-      lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode);
+        lines.push(qtyPart + padRight(wrapped[0], columnWidth - qtyPart.length));
 
-      wrapped.slice(1).forEach(extraLine => {
-        lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
-      });
+        wrapped.slice(1).forEach(extraLine => {
+          lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
+        });
+      } else if (title.toLowerCase() === "trainer" && card.setNumber) {
+        const firstLineNameWidth = columnWidth - qtyPart.length - card.setAbbrev.length - 1;
+        const wrapped = wrapWords(card.name, firstLineNameWidth);
+
+        lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + card.setAbbrev);
+
+        wrapped.slice(1).forEach(extraLine => {
+          lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
+        });
+      } else {
+        const firstLineNameWidth = columnWidth - qtyPart.length - setCode.length - 1;
+        const wrapped = wrapWords(card.name, firstLineNameWidth);
+
+        lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode);
+
+        wrapped.slice(1).forEach(extraLine => {
+          lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
+        });
+      }
     } else {
       const wrapped = wrapWords(card.name, columnWidth - qtyPart.length);
 
