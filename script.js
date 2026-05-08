@@ -15,6 +15,7 @@ const warning = document.getElementById("warning");
 const totalDisplay = document.getElementById("total");
 const borderCharInput = document.getElementById("borderChar");
 const paperWidthInput = document.getElementById("paperWidth");
+const columnsInput = document.getElementById("columns");
 
 let previewBgColor = "#0b0b0b";
 let previewStyle = "default";
@@ -224,7 +225,9 @@ function makeSection(title, cards, columnWidth) {
     const setCode = card.setCode || "";
 
     if (setCode) {
-      if (title.toLowerCase() === "energy") {
+      const section = title.toLowerCase();
+
+      if (section === "energy") {
         const wrapped = wrapWords(card.name, columnWidth - qtyPart.length);
 
         lines.push(qtyPart + padRight(wrapped[0], columnWidth - qtyPart.length));
@@ -232,11 +235,20 @@ function makeSection(title, cards, columnWidth) {
         wrapped.slice(1).forEach(extraLine => {
           lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
         });
-      } else if (title.toLowerCase() === "trainer" && card.setNumber) {
+      } else if (section === "trainer") {
         const firstLineNameWidth = columnWidth - qtyPart.length - card.setAbbrev.length - 1;
         const wrapped = wrapWords(card.name, firstLineNameWidth);
 
         lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + card.setAbbrev);
+
+        wrapped.slice(1).forEach(extraLine => {
+          lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
+        });
+      } else if (section === "pokemon" && card.setNumber) {
+        const firstLineNameWidth = columnWidth - qtyPart.length - setCode.length - 1;
+        const wrapped = wrapWords(card.name, firstLineNameWidth);
+
+        lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode);
 
         wrapped.slice(1).forEach(extraLine => {
           lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
@@ -296,11 +308,12 @@ function buildAscii() {
   const infoBox = makeInfoBox();
   const leftMargin = 0;
   const gapAfterBox = 6;
-  const columnGap = 8;
+  const columns = Number(columnsInput?.value || 2);
+  const columnGap = columns === 1 ? 0 : 8;
   const infoBoxWidth = infoBox[0].length;
   const rightPadding = 2;
   const contentWidth = pageWidth - rightPadding;
-  const cardColumnWidth = Math.floor((contentWidth - infoBoxWidth - gapAfterBox - columnGap) / 2);
+  const cardColumnWidth = Math.floor((contentWidth - infoBoxWidth - gapAfterBox - columnGap) / columns);
 
   let leftDeckColumn;
   let rightDeckColumn;
@@ -309,25 +322,43 @@ function buildAscii() {
     const leftSections = [];
     const rightSections = [];
 
-    if (sections.seenSections.pokemon) {
-      leftSections.push(...makeSection("Pokemon", sections.pokemon, cardColumnWidth), "", "");
-    }
+    if (columns === 1) {
+      if (sections.seenSections.pokemon) {
+        leftSections.push(...makeSection("Pokemon", sections.pokemon, cardColumnWidth), "", "");
+      }
 
-    if (sections.seenSections.energy) {
-      leftSections.push(...makeSection("Energy", sections.energy, cardColumnWidth), "", "");
-    }
+      if (sections.seenSections.trainer) {
+        leftSections.push(...makeSection("Trainer", sections.trainer, cardColumnWidth), "", "");
+      }
 
-    if (sections.seenSections.trainer) {
-      rightSections.push(...makeSection("Trainer", sections.trainer, cardColumnWidth), "", "");
-    }
+      if (sections.seenSections.energy) {
+        leftSections.push(...makeSection("Energy", sections.energy, cardColumnWidth), "", "");
+      }
 
-    if (sections.main.length) {
-      const blankLines = makeSection("------", sections.main, cardColumnWidth);
+      if (sections.main.length) {
+        leftSections.push(...makeSection("------", sections.main, cardColumnWidth));
+      }
+    } else {
+      if (sections.seenSections.pokemon) {
+        leftSections.push(...makeSection("Pokemon", sections.pokemon, cardColumnWidth), "", "");
+      }
 
-      if (leftSections.length <= rightSections.length) {
-        leftSections.push(...blankLines);
-      } else {
-        rightSections.push(...blankLines);
+      if (sections.seenSections.energy) {
+        leftSections.push(...makeSection("Energy", sections.energy, cardColumnWidth), "", "");
+      }
+
+      if (sections.seenSections.trainer) {
+        rightSections.push(...makeSection("Trainer", sections.trainer, cardColumnWidth), "", "");
+      }
+
+      if (sections.main.length) {
+        const blankLines = makeSection("------", sections.main, cardColumnWidth);
+
+        if (leftSections.length <= rightSections.length) {
+          leftSections.push(...blankLines);
+        } else {
+          rightSections.push(...blankLines);
+        }
       }
     }
 
