@@ -168,6 +168,19 @@ function makeInfoBox() {
   return lines;
 }
 
+function setFieldVisibility(fieldName, visible) {
+  const control = document.querySelector(`[data-field-control="${fieldName}"]`);
+  if (control) {
+    control.style.display = visible ? "" : "none";
+  }
+}
+
+function updateFieldVisibility() {
+  document.querySelectorAll(".field-toggle").forEach(toggle => {
+    setFieldVisibility(toggle.dataset.field, toggle.checked);
+  });
+}
+
 function wrapWords(text, width) {
   const words = String(text || "").split(/ +/).filter(Boolean);
   const lines = [];
@@ -583,6 +596,12 @@ document.querySelectorAll("input, textarea, select").forEach(el => {
   el.addEventListener("change", updatePreview);
 });
 
+document.querySelectorAll(".field-toggle").forEach(toggle => {
+  toggle.addEventListener("change", () => {
+    setFieldVisibility(toggle.dataset.field, toggle.checked);
+  });
+});
+
 document.querySelectorAll(".color-swatch").forEach(button => {
   button.addEventListener("click", () => {
     previewBgColor = button.dataset.color;
@@ -614,5 +633,6 @@ document.querySelectorAll(".number-box").forEach(button => {
 document.getElementById("printBtn").addEventListener("click", () => window.print());
 document.getElementById("saveBtn").addEventListener("click", savePreviewImage);
 
+updateFieldVisibility();
 updatePreviewBackground();
 updatePreview();
