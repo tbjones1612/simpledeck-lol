@@ -13,6 +13,7 @@
     <section class="left-column">
       <div class="preview-header">
         <h1>simpledeck.lol</h1>
+        <button type="button" id="resetBtn" class="reset-text">RESET</button>
       </div>
 
       <div class="controls" aria-label="Decklist controls" autocomplete="off">
@@ -21,7 +22,7 @@
 
           <label data-field-control="deckTitle">Title
             <input id="deckTitle" maxlength="60"
-              placeholder="Title your deck!" value="Boom Boom Groovin" autocomplete="off" />
+              placeholder="Title your deck!" value="Festival Lead" autocomplete="off" />
           </label>
 
           <label data-field-control="playerName">Player Name
@@ -34,15 +35,15 @@
 
           <label data-field-control="eventName">Event
             <input id="eventName" maxlength="60"
-              placeholder="Where are you competing?" value="Great Lakes Gaming Wooper Wednesday" autocomplete="off" />
+              placeholder="Where are you competing?" value="Great Lakes Gaming" autocomplete="off" />
           </label>
 
           <div class="row">
-            <label data-field-control="date">Date
+            <label data-field-control="date">List Date
               <input id="date" maxlength="20" placeholder="List create date" autocomplete="off" />
             </label>
 
-            <label data-field-control="competitionDate">Competition Date
+            <label data-field-control="competitionDate">Event Date
               <input id="competitionDate" maxlength="20" placeholder="Event date" autocomplete="off" />
             </label>
           </div>
@@ -112,16 +113,16 @@ Total Cards: 60</textarea>
 
             <label>Paper Width
               <select id="paperWidth" autocomplete="off" >
-                <option value="92" selected>92 characters</option>
-                <option value="86">86 characters</option>
+                <option value="86" selected>86 characters</option>
+                <option value="92">92 characters</option>
                 <option value="100">100 characters</option>
               </select>
             </label>
 
             <label>Columns
               <select id="columns" autocomplete="off">
-                <option value="2" selected>2</option>
-                <option value="1">1</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
               </select>
             </label>
           </div>
@@ -147,12 +148,16 @@ Total Cards: 60</textarea>
             title="Psychic"></button>
           <button type="button" class="color-swatch" data-color="#4a2608" style="--swatch-color:#4a2608"
             title="Fighting"></button>
-          <button type="button" class="color-swatch" data-color="#050811" style="--swatch-color:#050811"
+          <button type="button" class="color-swatch" data-color="#080F1F" style="--swatch-color:#080F1F"
             title="Dark"></button>
           <button type="button" class="color-swatch" data-color="#454850" style="--swatch-color:#454850"
             title="Steel"></button>
           <button type="button" class="color-swatch" data-color="#403713" style="--swatch-color:#403713"
             title="Dragon"></button>
+          <button type="button" class="color-swatch" data-color="#ffffff" style="--swatch-color:#ffffff"
+            title="White"></button>
+          <button type="button" class="color-swatch" data-bg="rainbow" style="--swatch-color:linear-gradient(135deg,rgba(255,0,0,0.24),rgba(255,255,0,0.24),rgba(0,255,0,0.24),rgba(0,255,255,0.24),rgba(0,0,255,0.24),rgba(255,0,255,0.24))"
+            title="Rainbow"></button>
         </div>
 
         <div class="number-row" aria-label="Background style">
@@ -179,6 +184,17 @@ Total Cards: 60</textarea>
       </div>
     </section>
   </main>
+
+  <div id="resetDialog" class="reset-confirm-overlay" hidden>
+    <div class="reset-confirm" role="dialog" aria-modal="true" aria-labelledby="resetDialogTitle">
+      <h2 id="resetDialogTitle">Are you sure you're sure?</h2>
+      <p>CLEAR all Deck Info and Decklist?</p>
+      <div class="reset-confirm-actions">
+        <button type="button" id="cancelResetBtn" class="secondary">Cancel</button>
+        <button type="button" id="confirmResetBtn" class="danger">Confirm</button>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
