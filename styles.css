@@ -106,6 +106,14 @@
       gap: 10px;
     }
 
+    .date-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .date-row.single-date {
+      grid-template-columns: 1fr;
+    }
+
     .checks {
       display: grid;
       grid-template-columns: 1fr 1fr;

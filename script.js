@@ -20,10 +20,17 @@ const resetButton = document.getElementById("resetBtn");
 const resetDialog = document.getElementById("resetDialog");
 const cancelResetButton = document.getElementById("cancelResetBtn");
 const confirmResetButton = document.getElementById("confirmResetBtn");
+const dateRow = document.getElementById("dateRow");
+const deckInputStorageKey = "simpledeck.deckInput";
 
 let previewBgColor = "#0b0b0b";
 let previewBgMode = "color";
 let previewStyle = "default";
+
+const savedDeckInput = localStorage.getItem(deckInputStorageKey);
+if (savedDeckInput !== null) {
+  deckInput.value = savedDeckInput;
+}
 
 function repeat(char, count) {
   return String(char || " ").repeat(Math.max(0, count));
@@ -225,6 +232,13 @@ function updateFieldVisibility() {
   document.querySelectorAll(".field-toggle").forEach(toggle => {
     setFieldVisibility(toggle.dataset.field, toggle.checked);
   });
+
+  const visibleDateFields = ["date", "competitionDate"].filter(fieldName => {
+    const toggle = document.querySelector(`.field-toggle[data-field="${fieldName}"]`);
+    return toggle?.checked;
+  });
+
+  dateRow.classList.toggle("single-date", visibleDateFields.length === 1);
 }
 
 function wrapWords(text, width) {
@@ -800,6 +814,7 @@ function resetControls() {
     el.value = "";
   });
 
+  localStorage.setItem(deckInputStorageKey, deckInput.value);
   updatePreview();
 }
 
@@ -808,9 +823,14 @@ document.querySelectorAll("input, textarea, select").forEach(el => {
   el.addEventListener("change", updatePreview);
 });
 
+deckInput.addEventListener("input", () => {
+  localStorage.setItem(deckInputStorageKey, deckInput.value);
+});
+
 document.querySelectorAll(".field-toggle").forEach(toggle => {
   toggle.addEventListener("change", () => {
     setFieldVisibility(toggle.dataset.field, toggle.checked);
+    updateFieldVisibility();
   });
 });
 
