@@ -18,6 +18,7 @@ const paperWidthInput = document.getElementById("paperWidth");
 const columnsInput = document.getElementById("columns");
 
 let previewBgColor = "#0b0b0b";
+let previewBgMode = "color";
 let previewStyle = "default";
 
 function repeat(char, count) {
@@ -482,13 +483,16 @@ function applyCanvasBackground(ctx, width, height) {
   const base = previewBgColor;
   const dark10 = darken(base, 0.10);
   const light10 = lighten(base, 0.10);
+  const lineTint = base.toLowerCase().trim() === "#ffffff"
+    ? "rgba(0,0,0,0.10)"
+    : rgbaFromHex(lighten(base, 0.45), 0.10);
 
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, width, height);
 
   if (previewStyle === "lines") {
     ctx.save();
-    ctx.strokeStyle = rgbaFromHex(lighten(base, 0.45), 0.10);
+    ctx.strokeStyle = lineTint;
     ctx.lineWidth = 2;
 
     const spacing = 14;
@@ -557,10 +561,26 @@ function applyCanvasBackground(ctx, width, height) {
 }
 
 function updatePreviewBackground() {
-  const base = previewBgColor;
-  const dark10 = darken(base, 0.10);
-  const light10 = lighten(base, 0.10);
-  const lineTint = rgbaFromHex(lighten(base, 0.45), 0.10);
+  const base = previewBgMode === "rainbow"
+    ? `radial-gradient(circle at 50% 50%,
+      rgba(172, 45, 51, 1) 0%,
+      rgb(172, 60, 45) 10%,
+      rgb(190, 97, 15) 20%,
+      rgb(165, 149, 3) 36%,
+      rgba(91, 153, 29, 1) 48%,
+      rgba(23, 153, 165, 1) 60%,
+      rgba(58, 67, 196, 1) 72%,
+      rgba(170, 66, 223, 1) 84%,
+      rgba(207, 67, 74, 1) 96%,
+      rgba(207, 67, 74, 1) 100%
+    )`
+    : previewBgColor;
+
+  const dark10 = darken(previewBgMode === "rainbow" ? "#111111" : base, 0.10);
+  const light10 = lighten(previewBgMode === "rainbow" ? "#111111" : base, 0.10);
+  const lineTint = base.toLowerCase().trim() === "#ffffff"
+    ? "rgba(0,0,0,0.10)"
+    : rgbaFromHex(lighten(previewBgMode === "rainbow" ? "#111111" : base, 0.45), 0.10);
 
   let overlay = "none";
   let size = "cover";
@@ -587,6 +607,15 @@ function updatePreviewBackground() {
       ${base} 66%,
       ${dark10} 100%
     )`;
+  } else if (previewStyle === "rainbow") {
+    overlay = `radial-gradient(circle at 50% 50%, rgba(255,255,255,0.14), transparent 30%),
+      radial-gradient(circle at 20% 20%, rgba(255,0,0,0.12), transparent 22%),
+      radial-gradient(circle at 80% 25%, rgba(255,165,0,0.10), transparent 26%),
+      radial-gradient(circle at 25% 80%, rgba(0,255,255,0.10), transparent 24%),
+      radial-gradient(circle at 75% 70%, rgba(128,0,128,0.10), transparent 28%)`;
+    size = "cover";
+    position = "center center";
+    repeatMode = "no-repeat";
   } else if (previewStyle === "ball") {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
       <circle cx="500" cy="500" r="430" fill="none" stroke="${dark10}" stroke-width="108"/>
@@ -606,6 +635,36 @@ function updatePreviewBackground() {
   document.documentElement.style.setProperty("--preview-size", size);
   document.documentElement.style.setProperty("--preview-position", position);
   document.documentElement.style.setProperty("--preview-repeat", repeatMode);
+
+  const textColor = previewBgMode === "rainbow"
+    ? "#f5f5f5"
+    : base.toLowerCase().trim() === "#ffffff" ? "#111111" : "#f5f5f5";
+  document.documentElement.style.setProperty("--preview-text", textColor);
+
+  updateStyleAvailability();
+}
+
+const styleButtons = Array.from(document.querySelectorAll(".number-box"));
+
+function updateStyleAvailability() {
+  const disableRainbow = previewBgMode === "rainbow";
+
+  styleButtons.forEach(button => {
+    const style = button.dataset.style;
+    const disabled = disableRainbow && (style === "lines" || style === "gradient" || style === "ball");
+
+    button.disabled = disabled;
+    button.classList.toggle("disabled", disabled);
+    button.setAttribute("aria-disabled", disabled ? "true" : "false");
+  });
+
+  if (disableRainbow && (previewStyle === "lines" || previewStyle === "gradient" || previewStyle === "ball")) {
+    previewStyle = "default";
+  }
+
+  styleButtons.forEach(button => {
+    button.classList.toggle("active", button.dataset.style === previewStyle);
+  });
 }
 
 function savePreviewImage() {
@@ -660,7 +719,15 @@ document.querySelectorAll(".field-toggle").forEach(toggle => {
 
 document.querySelectorAll(".color-swatch").forEach(button => {
   button.addEventListener("click", () => {
-    previewBgColor = button.dataset.color;
+    if (button.dataset.bg === "rainbow") {
+      previewBgMode = "rainbow";
+      previewStyle = "default";
+    } else if (button.dataset.color) {
+      previewBgMode = "color";
+      previewBgColor = button.dataset.color;
+    }
+
+    if (button.dataset.style) previewStyle = button.dataset.style;
 
     updatePreviewBackground();
 

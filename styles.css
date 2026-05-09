@@ -152,7 +152,7 @@
 
     .color-row {
       display: grid;
-      grid-template-columns: repeat(10, 1fr);
+      grid-template-columns: repeat(12, 1fr);
       gap: 6px;
       margin-top: 14px;
     }
@@ -200,6 +200,15 @@
       outline-offset: 2px;
     }
 
+    .number-box:disabled,
+    .number-box.disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: #555555;
+      color: #888888;
+      background: #1a1a1a;
+    }
+
     .warning {
       color: var(--danger);
       font-size: 14px;
@@ -244,12 +253,11 @@
       position: relative;
       display: inline-block;
       padding: 34px 38px;
-      background-color: var(--preview-base, #0b0b0b);
-      background-image: var(--preview-overlay, none);
-      background-repeat: var(--preview-repeat, no-repeat);
-      background-position: var(--preview-position, center);
-      background-size: var(--preview-size, cover);
-      color: #f5f5f5;
+      background: var(--preview-overlay, none), var(--preview-base, #0b0b0b);
+      background-repeat: var(--preview-repeat, no-repeat), no-repeat;
+      background-position: var(--preview-position, center), center;
+      background-size: var(--preview-size, cover), cover;
+      color: var(--preview-text, #f5f5f5);
       border: 1px solid #333333;
       box-shadow: 0 18px 48px rgba(0,0,0,0.35);
     }
