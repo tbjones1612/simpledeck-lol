@@ -480,14 +480,34 @@ function svgToDataUri(svg) {
 }
 
 function applyCanvasBackground(ctx, width, height) {
-  const base = previewBgColor;
-  const dark10 = darken(base, 0.10);
-  const light10 = lighten(base, 0.10);
-  const lineTint = base.toLowerCase().trim() === "#ffffff"
+  const isRainbow = previewBgMode === "rainbow";
+  const base = isRainbow ? null : previewBgColor;
+  const dark10 = darken(isRainbow ? "#111111" : base, 0.10);
+  const light10 = lighten(isRainbow ? "#111111" : base, 0.10);
+  const lineTint = !isRainbow && base.toLowerCase().trim() === "#ffffff"
     ? "rgba(0,0,0,0.10)"
-    : rgbaFromHex(lighten(base, 0.45), 0.10);
+    : rgbaFromHex(light10, 0.10);
 
-  ctx.fillStyle = base;
+  if (isRainbow) {
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = Math.max(width, height) * 0.65;
+    const gradient = ctx.createRadialGradient(cx, cy, radius * 0.02, cx, cy, radius);
+    gradient.addColorStop(0, "rgba(172,45,51,1)");
+    gradient.addColorStop(0.12, "rgba(172,45,51,1)");
+    gradient.addColorStop(0.24, "rgb(190,97,15)");
+    gradient.addColorStop(0.36, "rgb(167,126,4)");
+    gradient.addColorStop(0.48, "rgba(91,153,29,1)");
+    gradient.addColorStop(0.60, "rgba(23,153,165,1)");
+    gradient.addColorStop(0.72, "rgba(58,67,196,1)");
+    gradient.addColorStop(0.84, "rgba(170,66,223,1)");
+    gradient.addColorStop(0.96, "rgba(207,67,74,1)");
+    gradient.addColorStop(1, "rgba(207,67,74,1)");
+    ctx.fillStyle = gradient;
+  } else {
+    ctx.fillStyle = base;
+  }
+
   ctx.fillRect(0, 0, width, height);
 
   if (previewStyle === "lines") {
@@ -514,7 +534,7 @@ function applyCanvasBackground(ctx, width, height) {
     const gradient = ctx.createLinearGradient(0, 0, width, height);
     gradient.addColorStop(0, dark10);
     gradient.addColorStop(0.33, light10);
-    gradient.addColorStop(0.66, base);
+    gradient.addColorStop(0.66, isRainbow ? "rgba(255,255,255,0)" : base);
     gradient.addColorStop(1, dark10);
 
     ctx.fillStyle = gradient;
@@ -692,9 +712,13 @@ function savePreviewImage() {
 
   applyCanvasBackground(ctx, canvas.width, canvas.height);
 
+  const textColor = previewBgMode === "rainbow"
+    ? "#f5f5f5"
+    : previewBgColor.toLowerCase().trim() === "#ffffff" ? "#111111" : "#f5f5f5";
+
   ctx.font = font;
   ctx.textBaseline = "top";
-  ctx.fillStyle = "#f5f5f5";
+  ctx.fillStyle = textColor;
 
   lines.forEach((line, index) => {
     ctx.fillText(line, paddingX, paddingY + index * lineHeight);
