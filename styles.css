@@ -150,6 +150,12 @@
       color: var(--text);
     }
 
+    button.danger {
+      border-color: #ff0000;
+      background: #ff0000;
+      color: #ffffff;
+    }
+
     .color-row {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
@@ -234,6 +240,65 @@
       font-size: 15px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+    }
+
+    .preview-header .reset-text {
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 120ms ease;
+    }
+
+    .preview-header .reset-text:hover {
+      color: #ff0000;
+    }
+
+    .reset-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.62);
+    }
+
+    .reset-confirm-overlay[hidden] {
+      display: none;
+    }
+
+    .reset-confirm {
+      width: min(320px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 18px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.48);
+    }
+
+    .reset-confirm h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .reset-confirm p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .reset-confirm-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
     .total {

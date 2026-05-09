@@ -13,6 +13,7 @@
     <section class="left-column">
       <div class="preview-header">
         <h1>simpledeck.lol</h1>
+        <button type="button" id="resetBtn" class="reset-text">RESET</button>
       </div>
 
       <div class="controls" aria-label="Decklist controls" autocomplete="off">
@@ -183,6 +184,17 @@ Total Cards: 60</textarea>
       </div>
     </section>
   </main>
+
+  <div id="resetDialog" class="reset-confirm-overlay" hidden>
+    <div class="reset-confirm" role="dialog" aria-modal="true" aria-labelledby="resetDialogTitle">
+      <h2 id="resetDialogTitle">Are you sure you're sure?</h2>
+      <p>CLEAR all Deck Info and Decklist?</p>
+      <div class="reset-confirm-actions">
+        <button type="button" id="cancelResetBtn" class="secondary">Cancel</button>
+        <button type="button" id="confirmResetBtn" class="danger">Confirm</button>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

@@ -16,6 +16,10 @@ const totalDisplay = document.getElementById("total");
 const borderCharInput = document.getElementById("borderChar");
 const paperWidthInput = document.getElementById("paperWidth");
 const columnsInput = document.getElementById("columns");
+const resetButton = document.getElementById("resetBtn");
+const resetDialog = document.getElementById("resetDialog");
+const cancelResetButton = document.getElementById("cancelResetBtn");
+const confirmResetButton = document.getElementById("confirmResetBtn");
 
 let previewBgColor = "#0b0b0b";
 let previewBgMode = "color";
@@ -47,6 +51,7 @@ function parseDeck(text) {
   const totalCardsPattern = new RegExp("^ *total +cards *: *[0-9]+ *$", "i");
   const cardWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z]{3}) +([0-9]+) *$");
   const basicCardPattern = new RegExp("^([0-9]+) +(.+)$");
+  const rawQuantityPattern = new RegExp("^([0-9]+) +(.+)$");
 
   const sections = {
     pokemon: [],
@@ -62,13 +67,46 @@ function parseDeck(text) {
   };
 
   let currentSection = "main";
-
-  text
+  const lines = text
     .replaceAll(String.fromCharCode(13), "")
     .split(String.fromCharCode(10))
     .map(line => line.trim())
-    .filter(Boolean)
-    .forEach(line => {
+    .filter(Boolean);
+
+  const hasSectionHeaders = lines.some(line => sectionHeaderPattern.test(line));
+
+  if (!hasSectionHeaders) {
+    lines.forEach(line => {
+      if (totalCardsPattern.test(line)) return;
+
+      const rawMatch = line.match(rawQuantityPattern);
+
+      if (rawMatch && Number(rawMatch[1]) <= 60) {
+        sections.main.push({
+          qty: Number(rawMatch[1]),
+          qtyText: rawMatch[1],
+          name: rawMatch[2].trim(),
+          setCode: "",
+          setAbbrev: "",
+          setNumber: ""
+        });
+        return;
+      }
+
+      sections.main.push({
+        qty: 1,
+        qtyText: "1",
+        name: line,
+        setCode: "",
+        setAbbrev: "",
+        setNumber: ""
+      });
+    });
+
+    return sections;
+  }
+
+  lines.forEach(line => {
       if (totalCardsPattern.test(line)) return;
 
       if (sectionHeaderPattern.test(line)) {
@@ -84,7 +122,7 @@ function parseDeck(text) {
       }
 
       const setMatch = line.match(cardWithSetPattern);
-      if (setMatch) {
+      if (setMatch && Number(setMatch[1]) <= 60) {
         sections[currentSection].push({
           qty: Number(setMatch[1]),
           qtyText: setMatch[1],
@@ -97,7 +135,7 @@ function parseDeck(text) {
       }
 
       const basicMatch = line.match(basicCardPattern);
-      if (basicMatch) {
+      if (basicMatch && Number(basicMatch[1]) <= 60) {
         sections[currentSection].push({
           qty: Number(basicMatch[1]),
           qtyText: basicMatch[1],
@@ -212,8 +250,10 @@ function wrapWords(text, width) {
 function makeSection(title, cards, columnWidth) {
   const lines = [];
 
-  lines.push(padRight(title, columnWidth));
-  lines.push(padRight(underline(title), columnWidth));
+  if (title) {
+    lines.push(padRight(title, columnWidth));
+    lines.push(padRight(underline(title), columnWidth));
+  }
 
   if (!cards.length) {
     lines.push(padRight("", columnWidth));
@@ -295,6 +335,16 @@ function combineColumns(leftLines, rightLines, gap) {
   return out;
 }
 
+function trimTrailingBlankLines(lines) {
+  const trimmed = [...lines];
+
+  while (trimmed[trimmed.length - 1] === "") {
+    trimmed.pop();
+  }
+
+  return trimmed;
+}
+
 function buildAscii() {
   const borderChar = borderCharInput.value || "#";
   const pageWidth = Number(paperWidthInput.value);
@@ -337,7 +387,7 @@ function buildAscii() {
       }
 
       if (sections.main.length) {
-        leftSections.push(...makeSection("------", sections.main, cardColumnWidth));
+        leftSections.push(...makeSection("", sections.main, cardColumnWidth));
       }
     } else {
       if (sections.seenSections.pokemon) {
@@ -353,7 +403,7 @@ function buildAscii() {
       }
 
       if (sections.main.length) {
-        const blankLines = makeSection("------", sections.main, cardColumnWidth);
+        const blankLines = makeSection("", sections.main, cardColumnWidth);
 
         if (leftSections.length <= rightSections.length) {
           leftSections.push(...blankLines);
@@ -363,11 +413,15 @@ function buildAscii() {
       }
     }
 
-    leftDeckColumn = leftSections.length ? leftSections.slice(0, -2) : [];
-    rightDeckColumn = rightSections.length ? rightSections.slice(0, -2) : [];
+    leftDeckColumn = trimTrailingBlankLines(leftSections);
+    rightDeckColumn = trimTrailingBlankLines(rightSections);
   } else {
-    leftDeckColumn = makeSection("------", sections.main.filter((_, index) => index % 2 === 0), cardColumnWidth);
-    rightDeckColumn = makeSection("------", sections.main.filter((_, index) => index % 2 === 1), cardColumnWidth);
+    leftDeckColumn = makeSection("", columns === 1
+      ? sections.main
+      : sections.main.filter((_, index) => index % 2 === 0), cardColumnWidth);
+    rightDeckColumn = columns === 1
+      ? []
+      : makeSection("", sections.main.filter((_, index) => index % 2 === 1), cardColumnWidth);
   }
 
   const deckColumns = combineColumns(leftDeckColumn, rightDeckColumn, columnGap);
@@ -730,6 +784,25 @@ function savePreviewImage() {
   link.click();
 }
 
+function openResetDialog() {
+  resetDialog.hidden = false;
+  confirmResetButton.focus();
+}
+
+function closeResetDialog() {
+  resetDialog.hidden = true;
+  resetButton.focus();
+}
+
+function resetControls() {
+  document.querySelectorAll("input:not([type='checkbox']), textarea").forEach(el => {
+    if (el === borderCharInput) return;
+    el.value = "";
+  });
+
+  updatePreview();
+}
+
 document.querySelectorAll("input, textarea, select").forEach(el => {
   el.addEventListener("input", updatePreview);
   el.addEventListener("change", updatePreview);
@@ -775,6 +848,23 @@ document.querySelectorAll(".number-box").forEach(button => {
 
     updatePreviewBackground();
   });
+});
+
+resetButton.addEventListener("click", openResetDialog);
+cancelResetButton.addEventListener("click", closeResetDialog);
+confirmResetButton.addEventListener("click", () => {
+  resetControls();
+  closeResetDialog();
+});
+
+resetDialog.addEventListener("click", event => {
+  if (event.target === resetDialog) closeResetDialog();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !resetDialog.hidden) {
+    closeResetDialog();
+  }
 });
 
 document.getElementById("printBtn").addEventListener("click", () => window.print());
