@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<script data-goatcounter="https://tbjones1612.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +16,7 @@
     <section class="left-column">
       <div class="preview-header">
         <h1>simpledeck.lol</h1>
+        <button type="button" id="resetBtn" class="reset-text">RESET</button>
       </div>
 
       <div class="controls" aria-label="Decklist controls" autocomplete="off">
@@ -20,50 +24,55 @@
           <legend>Info Box</legend>
 
           <label data-field-control="deckTitle">Title
-            <input id="deckTitle" maxlength="60"
-              placeholder="Title your deck!" value="Boom Boom Groovin" autocomplete="off" />
+            <input id="deckTitle" maxlength="60" placeholder="Title your deck!">
           </label>
 
           <label data-field-control="playerName">Player Name
-            <input id="playerName" value="John Lastname" maxlength="60" placeholder="What is your name?" autocomplete="off" />
+            <input id="playerName" maxlength="60" placeholder="What is your name?" />
           </label>
 
           <label data-field-control="playerId">Player ID
-            <input id="playerId" maxlength="20" placeholder="Pokemon Play ID" value="1234567" autocomplete="off" />
+            <input id="playerId" maxlength="20" placeholder="Pokemon Play ID" />
           </label>
 
           <label data-field-control="eventName">Event
-            <input id="eventName" maxlength="60"
-              placeholder="Where are you competing?" value="Great Lakes Gaming Wooper Wednesday" autocomplete="off" />
+            <input id="eventName" maxlength="60" placeholder="Where are you competing?" />
           </label>
 
-          <div class="row">
-            <label data-field-control="date">Date
-              <input id="date" maxlength="20" placeholder="List create date" autocomplete="off" />
+          <div class="row date-row" id="dateRow">
+            <label data-field-control="date">List Date
+              <input id="date" maxlength="20"  placeholder="List date" />
             </label>
 
-            <label data-field-control="competitionDate">Competition Date
-              <input id="competitionDate" maxlength="20" placeholder="Event date" autocomplete="off" />
+            <label data-field-control="competitionDate">Event Date
+              <input id="competitionDate" maxlength="20" placeholder="Event date" />
             </label>
           </div>
 
           <label data-field-control="country">Country
-            <input id="country" value="USA" placeholder="Where are you from?" autocomplete="off" />
+            <input id="country" value="USA" placeholder="Where are you from?" />
           </label>
 
           <label data-field-control="deckArchetype">Deck Archetype
-            <input id="deckArchetype" maxlength="60" placeholder="Archetype / Variant" autocomplete="off" />
+            <input id="deckArchetype" maxlength="60" placeholder="Archetype / Variant" />
           </label>
 
           <div class="checks" aria-label="Visible info fields">
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="deckTitle" checked /> Title</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="playerName" checked /> Player</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="playerId" checked /> Player ID</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="eventName" checked /> Event</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="date" />List Date</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="competitionDate" /> Event Date</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="country" /> Country</label>
-            <label><input type="checkbox" class="field-toggle" autocomplete="off" data-field="deckArchetype" /> Archetype</label>
+            <label><input type="checkbox" class="field-toggle" data-field="deckTitle" checked />
+              Title</label>
+            <label><input type="checkbox" class="field-toggle" data-field="playerName" checked />
+              Player</label>
+            <label><input type="checkbox" class="field-toggle" data-field="playerId" checked />
+              Player ID</label>
+            <label><input type="checkbox" class="field-toggle" data-field="eventName" checked />
+              Event</label>
+            <label><input type="checkbox" class="field-toggle" data-field="date" />List Date</label>
+            <label><input type="checkbox" class="field-toggle" data-field="competitionDate" /> Event
+              Date</label>
+            <label><input type="checkbox" class="field-toggle" data-field="country" />
+              Country</label>
+            <label><input type="checkbox" class="field-toggle" data-field="deckArchetype" />
+              Archetype</label>
           </div>
         </fieldset>
 
@@ -71,57 +80,27 @@
           <legend>Decklist</legend>
 
           <label>Paste card list
-            <textarea id="deckInput" autocomplete="off" placeholder="Paste in your decklist using PTCGL formatting.">Pokémon: 10
-3 Thwackey TWM 15
-4 Dipplin TWM 18
-4 Applin SCR 12
-3 Grookey TWM 14
-2 Goldeen TWM 44
-1 Rillaboom TWM 16
-1 Rellor TEF 23
-1 Seaking PRE 21
-1 Rabsca TEF 24
-1 Psyduck ASC 39
-
-Trainer: 14
-3 Bug Catching Set TWM 143
-4 Festival Grounds TWM 149
-2 Black Belt's Training JTG 143
-1 Maximum Belt TEF 154
-4 Poké Pad ASC 198
-2 Night Stretcher ASC 196
-1 Sacred Ash DRI 168
-2 Hilda WHT 84
-2 Judge DRI 167
-3 Buddy-Buddy Poffin ASC 184
-2 Brave Bangle WHT 80
-3 Lillie's Determination MEG 119
-3 Boss's Orders ASC 183
-1 Air Balloon ASC 181
-
-Energy: 1
-6 Basic {G} Energy MEE 1
-
-Total Cards: 60</textarea>
+            <textarea id="deckInput" autocomplete="off" placeholder="Paste in your decklist using PTCGL formatting.">
+            </textarea>
           </label>
 
           <div class="row">
             <label>Border
-              <input id="borderChar" value="#" maxlength="1"  autocomplete="off" />
+              <input id="borderChar" value="#" maxlength="1" autocomplete="off" />
             </label>
 
             <label>Paper Width
-              <select id="paperWidth" autocomplete="off" >
-                <option value="92" selected>92 characters</option>
-                <option value="86">86 characters</option>
+              <select id="paperWidth" autocomplete="off">
+                <option value="86" selected>86 characters</option>
+                <option value="92">92 characters</option>
                 <option value="100">100 characters</option>
               </select>
             </label>
 
             <label>Columns
               <select id="columns" autocomplete="off">
-                <option value="2" selected>2</option>
-                <option value="1">1</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
               </select>
             </label>
           </div>
@@ -148,12 +127,17 @@ Total Cards: 60</textarea>
             title="Psychic"></button>
           <button type="button" class="color-swatch" data-color="#4a2608" style="--swatch-color:#4a2608"
             title="Fighting"></button>
-          <button type="button" class="color-swatch" data-color="#050811" style="--swatch-color:#050811"
+          <button type="button" class="color-swatch" data-color="#080F1F" style="--swatch-color:#080F1F"
             title="Dark"></button>
           <button type="button" class="color-swatch" data-color="#454850" style="--swatch-color:#454850"
             title="Steel"></button>
           <button type="button" class="color-swatch" data-color="#403713" style="--swatch-color:#403713"
             title="Dragon"></button>
+          <button type="button" class="color-swatch" data-color="#ffffff" style="--swatch-color:#ffffff"
+            title="White"></button>
+          <button type="button" class="color-swatch" data-bg="rainbow"
+            style="--swatch-color:linear-gradient(135deg,rgba(255,0,0,0.24),rgba(255,255,0,0.24),rgba(0,255,0,0.24),rgba(0,255,255,0.24),rgba(0,0,255,0.24),rgba(255,0,255,0.24))"
+            title="Rainbow"></button>
         </div>
 
         <div class="number-row" aria-label="Background style">
@@ -251,6 +235,13 @@ Total Cards: 60</textarea>
       </div>
       <div class="modal-actions">
         <button id="deckBuilderDone" type="button">Done</button>
+  <div id="resetDialog" class="reset-confirm-overlay" hidden>
+    <div class="reset-confirm" role="dialog" aria-modal="true" aria-labelledby="resetDialogTitle">
+      <h2 id="resetDialogTitle">Are you sure you're sure?</h2>
+      <p>CLEAR all Deck Info and Decklist?</p>
+      <div class="reset-confirm-actions">
+        <button type="button" id="cancelResetBtn" class="secondary">Cancel</button>
+        <button type="button" id="confirmResetBtn" class="danger">Confirm</button>
       </div>
     </div>
   </div>

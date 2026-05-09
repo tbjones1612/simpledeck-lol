@@ -34,8 +34,15 @@ const deckCountDisplay = document.getElementById("deckCount");
 const deckBuilderClose = document.getElementById("deckBuilderClose");
 const deckBuilderDone = document.getElementById("deckBuilderDone");
 const clearDeckBtn = document.getElementById("clearDeckBtn");
+const resetButton = document.getElementById("resetBtn");
+const resetDialog = document.getElementById("resetDialog");
+const cancelResetButton = document.getElementById("cancelResetBtn");
+const confirmResetButton = document.getElementById("confirmResetBtn");
+const dateRow = document.getElementById("dateRow");
+const deckInputStorageKey = "simpledeck.deckInput";
 
 let previewBgColor = "#0b0b0b";
+let previewBgMode = "color";
 let previewStyle = "default";
 
 let cardDatabase = [];
@@ -592,6 +599,9 @@ async function openDeckBuilder() {
 function closeDeckBuilder() {
   deckBuilderModal.classList.add("hidden");
   deckBuilderModal.setAttribute("aria-hidden", "true");
+const savedDeckInput = localStorage.getItem(deckInputStorageKey);
+if (savedDeckInput !== null) {
+  deckInput.value = savedDeckInput;
 }
 
 function repeat(char, count) {
@@ -620,6 +630,7 @@ function parseDeck(text) {
   const totalCardsPattern = new RegExp("^ *total +cards *: *[0-9]+ *$", "i");
   const cardWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z]{3}) +([0-9]+) *$");
   const basicCardPattern = new RegExp("^([0-9]+) +(.+)$");
+  const rawQuantityPattern = new RegExp("^([0-9]+) +(.+)$");
 
   const sections = {
     pokemon: [],
@@ -635,13 +646,46 @@ function parseDeck(text) {
   };
 
   let currentSection = "main";
-
-  text
+  const lines = text
     .replaceAll(String.fromCharCode(13), "")
     .split(String.fromCharCode(10))
     .map(line => line.trim())
-    .filter(Boolean)
-    .forEach(line => {
+    .filter(Boolean);
+
+  const hasSectionHeaders = lines.some(line => sectionHeaderPattern.test(line));
+
+  if (!hasSectionHeaders) {
+    lines.forEach(line => {
+      if (totalCardsPattern.test(line)) return;
+
+      const rawMatch = line.match(rawQuantityPattern);
+
+      if (rawMatch && Number(rawMatch[1]) <= 60) {
+        sections.main.push({
+          qty: Number(rawMatch[1]),
+          qtyText: rawMatch[1],
+          name: rawMatch[2].trim(),
+          setCode: "",
+          setAbbrev: "",
+          setNumber: ""
+        });
+        return;
+      }
+
+      sections.main.push({
+        qty: 1,
+        qtyText: "1",
+        name: line,
+        setCode: "",
+        setAbbrev: "",
+        setNumber: ""
+      });
+    });
+
+    return sections;
+  }
+
+  lines.forEach(line => {
       if (totalCardsPattern.test(line)) return;
 
       if (sectionHeaderPattern.test(line)) {
@@ -657,7 +701,7 @@ function parseDeck(text) {
       }
 
       const setMatch = line.match(cardWithSetPattern);
-      if (setMatch) {
+      if (setMatch && Number(setMatch[1]) <= 60) {
         sections[currentSection].push({
           qty: Number(setMatch[1]),
           qtyText: setMatch[1],
@@ -670,7 +714,7 @@ function parseDeck(text) {
       }
 
       const basicMatch = line.match(basicCardPattern);
-      if (basicMatch) {
+      if (basicMatch && Number(basicMatch[1]) <= 60) {
         sections[currentSection].push({
           qty: Number(basicMatch[1]),
           qtyText: basicMatch[1],
@@ -760,6 +804,13 @@ function updateFieldVisibility() {
   document.querySelectorAll(".field-toggle").forEach(toggle => {
     setFieldVisibility(toggle.dataset.field, toggle.checked);
   });
+
+  const visibleDateFields = ["date", "competitionDate"].filter(fieldName => {
+    const toggle = document.querySelector(`.field-toggle[data-field="${fieldName}"]`);
+    return toggle?.checked;
+  });
+
+  dateRow.classList.toggle("single-date", visibleDateFields.length === 1);
 }
 
 function wrapWords(text, width) {
@@ -785,8 +836,10 @@ function wrapWords(text, width) {
 function makeSection(title, cards, columnWidth) {
   const lines = [];
 
-  lines.push(padRight(title, columnWidth));
-  lines.push(padRight(underline(title), columnWidth));
+  if (title) {
+    lines.push(padRight(title, columnWidth));
+    lines.push(padRight(underline(title), columnWidth));
+  }
 
   if (!cards.length) {
     lines.push(padRight("", columnWidth));
@@ -868,6 +921,16 @@ function combineColumns(leftLines, rightLines, gap) {
   return out;
 }
 
+function trimTrailingBlankLines(lines) {
+  const trimmed = [...lines];
+
+  while (trimmed[trimmed.length - 1] === "") {
+    trimmed.pop();
+  }
+
+  return trimmed;
+}
+
 function buildAscii() {
   const borderChar = borderCharInput.value || "#";
   const pageWidth = Number(paperWidthInput.value);
@@ -910,7 +973,7 @@ function buildAscii() {
       }
 
       if (sections.main.length) {
-        leftSections.push(...makeSection("------", sections.main, cardColumnWidth));
+        leftSections.push(...makeSection("", sections.main, cardColumnWidth));
       }
     } else {
       if (sections.seenSections.pokemon) {
@@ -926,7 +989,7 @@ function buildAscii() {
       }
 
       if (sections.main.length) {
-        const blankLines = makeSection("------", sections.main, cardColumnWidth);
+        const blankLines = makeSection("", sections.main, cardColumnWidth);
 
         if (leftSections.length <= rightSections.length) {
           leftSections.push(...blankLines);
@@ -936,11 +999,15 @@ function buildAscii() {
       }
     }
 
-    leftDeckColumn = leftSections.length ? leftSections.slice(0, -2) : [];
-    rightDeckColumn = rightSections.length ? rightSections.slice(0, -2) : [];
+    leftDeckColumn = trimTrailingBlankLines(leftSections);
+    rightDeckColumn = trimTrailingBlankLines(rightSections);
   } else {
-    leftDeckColumn = makeSection("------", sections.main.filter((_, index) => index % 2 === 0), cardColumnWidth);
-    rightDeckColumn = makeSection("------", sections.main.filter((_, index) => index % 2 === 1), cardColumnWidth);
+    leftDeckColumn = makeSection("", columns === 1
+      ? sections.main
+      : sections.main.filter((_, index) => index % 2 === 0), cardColumnWidth);
+    rightDeckColumn = columns === 1
+      ? []
+      : makeSection("", sections.main.filter((_, index) => index % 2 === 1), cardColumnWidth);
   }
 
   const deckColumns = combineColumns(leftDeckColumn, rightDeckColumn, columnGap);
@@ -1053,16 +1120,39 @@ function svgToDataUri(svg) {
 }
 
 function applyCanvasBackground(ctx, width, height) {
-  const base = previewBgColor;
-  const dark10 = darken(base, 0.10);
-  const light10 = lighten(base, 0.10);
+  const isRainbow = previewBgMode === "rainbow";
+  const base = isRainbow ? null : previewBgColor;
+  const dark10 = darken(isRainbow ? "#111111" : base, 0.10);
+  const light10 = lighten(isRainbow ? "#111111" : base, 0.10);
+  const lineTint = !isRainbow && base.toLowerCase().trim() === "#ffffff"
+    ? "rgba(0,0,0,0.10)"
+    : rgbaFromHex(light10, 0.10);
 
-  ctx.fillStyle = base;
+  if (isRainbow) {
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = Math.max(width, height) * 0.65;
+    const gradient = ctx.createRadialGradient(cx, cy, radius * 0.02, cx, cy, radius);
+    gradient.addColorStop(0, "rgba(172,45,51,1)");
+    gradient.addColorStop(0.12, "rgba(172,45,51,1)");
+    gradient.addColorStop(0.24, "rgb(190,97,15)");
+    gradient.addColorStop(0.36, "rgb(167,126,4)");
+    gradient.addColorStop(0.48, "rgba(91,153,29,1)");
+    gradient.addColorStop(0.60, "rgba(23,153,165,1)");
+    gradient.addColorStop(0.72, "rgba(58,67,196,1)");
+    gradient.addColorStop(0.84, "rgba(170,66,223,1)");
+    gradient.addColorStop(0.96, "rgba(207,67,74,1)");
+    gradient.addColorStop(1, "rgba(207,67,74,1)");
+    ctx.fillStyle = gradient;
+  } else {
+    ctx.fillStyle = base;
+  }
+
   ctx.fillRect(0, 0, width, height);
 
   if (previewStyle === "lines") {
     ctx.save();
-    ctx.strokeStyle = rgbaFromHex(lighten(base, 0.45), 0.10);
+    ctx.strokeStyle = lineTint;
     ctx.lineWidth = 2;
 
     const spacing = 14;
@@ -1084,7 +1174,7 @@ function applyCanvasBackground(ctx, width, height) {
     const gradient = ctx.createLinearGradient(0, 0, width, height);
     gradient.addColorStop(0, dark10);
     gradient.addColorStop(0.33, light10);
-    gradient.addColorStop(0.66, base);
+    gradient.addColorStop(0.66, isRainbow ? "rgba(255,255,255,0)" : base);
     gradient.addColorStop(1, dark10);
 
     ctx.fillStyle = gradient;
@@ -1131,10 +1221,26 @@ function applyCanvasBackground(ctx, width, height) {
 }
 
 function updatePreviewBackground() {
-  const base = previewBgColor;
-  const dark10 = darken(base, 0.10);
-  const light10 = lighten(base, 0.10);
-  const lineTint = rgbaFromHex(lighten(base, 0.45), 0.10);
+  const base = previewBgMode === "rainbow"
+    ? `radial-gradient(circle at 50% 50%,
+      rgba(172, 45, 51, 1) 0%,
+      rgb(172, 60, 45) 10%,
+      rgb(190, 97, 15) 20%,
+      rgb(165, 149, 3) 36%,
+      rgba(91, 153, 29, 1) 48%,
+      rgba(23, 153, 165, 1) 60%,
+      rgba(58, 67, 196, 1) 72%,
+      rgba(170, 66, 223, 1) 84%,
+      rgba(207, 67, 74, 1) 96%,
+      rgba(207, 67, 74, 1) 100%
+    )`
+    : previewBgColor;
+
+  const dark10 = darken(previewBgMode === "rainbow" ? "#111111" : base, 0.10);
+  const light10 = lighten(previewBgMode === "rainbow" ? "#111111" : base, 0.10);
+  const lineTint = base.toLowerCase().trim() === "#ffffff"
+    ? "rgba(0,0,0,0.10)"
+    : rgbaFromHex(lighten(previewBgMode === "rainbow" ? "#111111" : base, 0.45), 0.10);
 
   let overlay = "none";
   let size = "cover";
@@ -1161,6 +1267,15 @@ function updatePreviewBackground() {
       ${base} 66%,
       ${dark10} 100%
     )`;
+  } else if (previewStyle === "rainbow") {
+    overlay = `radial-gradient(circle at 50% 50%, rgba(255,255,255,0.14), transparent 30%),
+      radial-gradient(circle at 20% 20%, rgba(255,0,0,0.12), transparent 22%),
+      radial-gradient(circle at 80% 25%, rgba(255,165,0,0.10), transparent 26%),
+      radial-gradient(circle at 25% 80%, rgba(0,255,255,0.10), transparent 24%),
+      radial-gradient(circle at 75% 70%, rgba(128,0,128,0.10), transparent 28%)`;
+    size = "cover";
+    position = "center center";
+    repeatMode = "no-repeat";
   } else if (previewStyle === "ball") {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
       <circle cx="500" cy="500" r="430" fill="none" stroke="${dark10}" stroke-width="108"/>
@@ -1180,6 +1295,36 @@ function updatePreviewBackground() {
   document.documentElement.style.setProperty("--preview-size", size);
   document.documentElement.style.setProperty("--preview-position", position);
   document.documentElement.style.setProperty("--preview-repeat", repeatMode);
+
+  const textColor = previewBgMode === "rainbow"
+    ? "#f5f5f5"
+    : base.toLowerCase().trim() === "#ffffff" ? "#111111" : "#f5f5f5";
+  document.documentElement.style.setProperty("--preview-text", textColor);
+
+  updateStyleAvailability();
+}
+
+const styleButtons = Array.from(document.querySelectorAll(".number-box"));
+
+function updateStyleAvailability() {
+  const disableRainbow = previewBgMode === "rainbow";
+
+  styleButtons.forEach(button => {
+    const style = button.dataset.style;
+    const disabled = disableRainbow && (style === "lines" || style === "gradient" || style === "ball");
+
+    button.disabled = disabled;
+    button.classList.toggle("disabled", disabled);
+    button.setAttribute("aria-disabled", disabled ? "true" : "false");
+  });
+
+  if (disableRainbow && (previewStyle === "lines" || previewStyle === "gradient" || previewStyle === "ball")) {
+    previewStyle = "default";
+  }
+
+  styleButtons.forEach(button => {
+    button.classList.toggle("active", button.dataset.style === previewStyle);
+  });
 }
 
 function savePreviewImage() {
@@ -1207,9 +1352,13 @@ function savePreviewImage() {
 
   applyCanvasBackground(ctx, canvas.width, canvas.height);
 
+  const textColor = previewBgMode === "rainbow"
+    ? "#f5f5f5"
+    : previewBgColor.toLowerCase().trim() === "#ffffff" ? "#111111" : "#f5f5f5";
+
   ctx.font = font;
   ctx.textBaseline = "top";
-  ctx.fillStyle = "#f5f5f5";
+  ctx.fillStyle = textColor;
 
   lines.forEach((line, index) => {
     ctx.fillText(line, paddingX, paddingY + index * lineHeight);
@@ -1221,20 +1370,53 @@ function savePreviewImage() {
   link.click();
 }
 
+function openResetDialog() {
+  resetDialog.hidden = false;
+  confirmResetButton.focus();
+}
+
+function closeResetDialog() {
+  resetDialog.hidden = true;
+  resetButton.focus();
+}
+
+function resetControls() {
+  document.querySelectorAll("input:not([type='checkbox']), textarea").forEach(el => {
+    if (el === borderCharInput) return;
+    el.value = "";
+  });
+
+  localStorage.setItem(deckInputStorageKey, deckInput.value);
+  updatePreview();
+}
+
 document.querySelectorAll("input, textarea, select").forEach(el => {
   el.addEventListener("input", updatePreview);
   el.addEventListener("change", updatePreview);
 });
 
+deckInput.addEventListener("input", () => {
+  localStorage.setItem(deckInputStorageKey, deckInput.value);
+});
+
 document.querySelectorAll(".field-toggle").forEach(toggle => {
   toggle.addEventListener("change", () => {
     setFieldVisibility(toggle.dataset.field, toggle.checked);
+    updateFieldVisibility();
   });
 });
 
 document.querySelectorAll(".color-swatch").forEach(button => {
   button.addEventListener("click", () => {
-    previewBgColor = button.dataset.color;
+    if (button.dataset.bg === "rainbow") {
+      previewBgMode = "rainbow";
+      previewStyle = "default";
+    } else if (button.dataset.color) {
+      previewBgMode = "color";
+      previewBgColor = button.dataset.color;
+    }
+
+    if (button.dataset.style) previewStyle = button.dataset.style;
 
     updatePreviewBackground();
 
@@ -1258,6 +1440,23 @@ document.querySelectorAll(".number-box").forEach(button => {
 
     updatePreviewBackground();
   });
+});
+
+resetButton.addEventListener("click", openResetDialog);
+cancelResetButton.addEventListener("click", closeResetDialog);
+confirmResetButton.addEventListener("click", () => {
+  resetControls();
+  closeResetDialog();
+});
+
+resetDialog.addEventListener("click", event => {
+  if (event.target === resetDialog) closeResetDialog();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !resetDialog.hidden) {
+    closeResetDialog();
+  }
 });
 
 document.getElementById("printBtn").addEventListener("click", () => window.print());
