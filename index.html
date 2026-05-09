@@ -107,6 +107,7 @@
         </fieldset>
 
         <div class="buttons">
+          <button id="buildDeckBtn" class="secondary">Build Deck</button>
           <button id="printBtn">Print to PDF</button>
           <button id="saveBtn" class="secondary">Save Image</button>
         </div>
@@ -164,6 +165,76 @@
     </section>
   </main>
 
+  <div id="deckBuilderModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="deckBuilderTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="deckBuilderTitle">Build Deck</h3>
+          <div id="deckCount">0 cards</div>
+        </div>
+
+        <div class="modal-header-actions">
+          <button id="clearDeckBtn" type="button" class="secondary">Clear Deck</button>
+          <button id="deckBuilderClose" type="button" class="modal-close" aria-label="Close deck builder">×</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="deck-search-panel">
+          <label>Search cards
+            <input id="deckSearchInput" autocomplete="off" placeholder="Search by card name..." />
+          </label>
+
+          <label class="deck-filter-row">
+            <input id="standardOnlyToggle" type="checkbox" />
+            Standard only (H, I, J)
+          </label>
+          <div class="deck-filter-controls" aria-label="Search filters">
+            <label>Type
+              <select id="cardTypeFilter">
+                <option value="">Any type</option>
+                <option value="pokemon">Pokémon</option>
+                <option value="supporter">Supporter</option>
+                <option value="trainer">Trainer</option>
+                <option value="energy">Energy</option>
+              </select>
+            </label>
+
+            <label>Rarity
+              <select id="cardRarityFilter">
+                <option value="">Any rarity</option>
+              </select>
+            </label>
+          </div>
+          <ul id="deckSearchResults" class="deck-search-results"></ul>
+        </div>
+
+        <div class="deck-column">
+          <div class="deck-column-header">
+            <h5>Pokémon</h5>
+            <span id="pokemonCount" class="deck-column-count">0</span>
+          </div>
+          <ul id="pokemonList" class="deck-list"></ul>
+        </div>
+
+        <div class="deck-column">
+          <div class="deck-column-header">
+            <h5>Supporters</h5>
+            <span id="trainerCount" class="deck-column-count">0</span>
+          </div>
+          <ul id="trainerList" class="deck-list"></ul>
+        </div>
+
+        <div class="deck-column">
+          <div class="deck-column-header">
+            <h5>Energy</h5>
+            <span id="energyCount" class="deck-column-count">0</span>
+          </div>
+          <ul id="energyList" class="deck-list"></ul>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="deckBuilderDone" type="button">Done</button>
   <div id="resetDialog" class="reset-confirm-overlay" hidden>
     <div class="reset-confirm" role="dialog" aria-modal="true" aria-labelledby="resetDialogTitle">
       <h2 id="resetDialogTitle">Are you sure you're sure?</h2>
