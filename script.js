@@ -23,7 +23,6 @@ const standardOnlyToggle = document.getElementById("standardOnlyToggle");
 const cardTypeFilter = document.getElementById("cardTypeFilter");
 const cardRarityFilter = document.getElementById("cardRarityFilter");
 const deckSearchResults = document.getElementById("deckSearchResults");
-const deckList = document.getElementById("deckList");
 const pokemonList = document.getElementById("pokemonList");
 const trainerList = document.getElementById("trainerList");
 const energyList = document.getElementById("energyList");
@@ -599,6 +598,8 @@ async function openDeckBuilder() {
 function closeDeckBuilder() {
   deckBuilderModal.classList.add("hidden");
   deckBuilderModal.setAttribute("aria-hidden", "true");
+}
+
 const savedDeckInput = localStorage.getItem(deckInputStorageKey);
 if (savedDeckInput !== null) {
   deckInput.value = savedDeckInput;
