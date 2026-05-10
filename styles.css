@@ -717,8 +717,94 @@
     }
 
     @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 16px;
+      }
+
+      .left-column {
+        position: static;
+      }
+
       .modal-body {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 12px;
+      }
+
+      .controls {
+        padding: 14px;
+      }
+
+      fieldset {
+        padding: 12px;
+      }
+
+      .row,
+      .date-row,
+      .checks,
+      .buttons,
+      .number-row,
+      .deck-filter-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .color-row {
+        grid-template-columns: repeat(6, 1fr);
+      }
+
+      .preview-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .page-shell {
+        padding: 10px;
+      }
+
+      #printPage {
+        padding: 22px 24px;
+      }
+
+      #asciiPreview {
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      .modal {
+        align-items: stretch;
+        padding: 10px;
+      }
+
+      .modal-dialog {
+        width: 100%;
+        height: calc(100vh - 20px);
+        min-height: 0;
+        border-radius: 10px;
+      }
+
+      .modal-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .modal-header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .modal-body {
+        padding: 12px;
+      }
+
+      .deck-search-panel {
+        min-height: 520px;
       }
     }
 
