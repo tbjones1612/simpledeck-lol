@@ -504,10 +504,13 @@ function normalizeDeckCardName(name) {
     .toLowerCase();
 }
 
-function normalizeSetCode(card) {
-  return String(card.set?.ptcgoCode || card.set?.id || "")
-    .trim()
-    .toUpperCase();
+function getNormalizedSetCodes(card) {
+  return [
+    card.set?.ptcgoCode,
+    card.set?.id
+  ]
+    .filter(Boolean)
+    .map(code => String(code).trim().toUpperCase());
 }
 
 function findCardInDatabase(parsedCard) {
@@ -520,10 +523,10 @@ function findCardInDatabase(parsedCard) {
   // like "Basic {G} Energy" vs "Basic Grass Energy".
   if (parsedSet && parsedNumber) {
     const setNumberMatch = cardDatabase.find(card => {
-      const cardSet = normalizeSetCode(card);
+      const cardSets = getNormalizedSetCodes(card);
       const cardNumber = String(card.number || "").trim();
 
-      return cardSet === parsedSet && cardNumber === parsedNumber;
+      return cardSets.includes(parsedSet) && cardNumber === parsedNumber;
     });
 
     if (setNumberMatch) {
@@ -629,7 +632,7 @@ function parseDeck(text) {
   const sectionHeaderPattern = new RegExp("^ *(pok[eé]mon|pokemon|trainer|trainers|energy) *: *[0-9]* *$", "i");
   const sectionNamePattern = new RegExp("^ *(pok[eé]mon|pokemon|trainer|trainers|energy) *:", "i");
   const totalCardsPattern = new RegExp("^ *total +cards *: *[0-9]+ *$", "i");
-  const cardWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z]{3}) +([0-9]+) *$");
+  const cardWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z0-9]{2,6}) +([0-9]+) *$");
   const basicCardPattern = new RegExp("^([0-9]+) +(.+)$");
   const rawQuantityPattern = new RegExp("^([0-9]+) +(.+)$");
 
@@ -658,6 +661,19 @@ function parseDeck(text) {
   if (!hasSectionHeaders) {
     lines.forEach(line => {
       if (totalCardsPattern.test(line)) return;
+
+      const setMatch = line.match(cardWithSetPattern);
+      if (setMatch && Number(setMatch[1]) <= 60) {
+        sections.main.push({
+          qty: Number(setMatch[1]),
+          qtyText: setMatch[1],
+          name: setMatch[2].trim(),
+          setCode: setMatch[3] + " " + setMatch[4],
+          setAbbrev: setMatch[3],
+          setNumber: setMatch[4]
+        });
+        return;
+      }
 
       const rawMatch = line.match(rawQuantityPattern);
 
