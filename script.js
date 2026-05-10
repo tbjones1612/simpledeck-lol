@@ -133,25 +133,25 @@ function searchDeckCards(query) {
   const searchTerms = normalized.split(" ");
 
   return cardDatabase.filter(card => {
-      if (!matchesCardTypeFilter(card, selectedType)) {
-        return false;
-      }
+    if (!matchesCardTypeFilter(card, selectedType)) {
+      return false;
+    }
 
-      if (selectedRarity && card.rarity !== selectedRarity) {
-        return false;
-      }
+    if (selectedRarity && card.rarity !== selectedRarity) {
+      return false;
+    }
 
-      const name = normalizeSearchText(card.name);
-      const compactName = name.replace(/\s+/g, "");
-      if (!searchTerms.every(term => name.includes(term) || compactName.includes(term))) {
-        return false;
-      }
-      if (!standardOnly) {
-        return true;
-      }
-      const mark = String(card.regulationMark || "").toUpperCase();
-      return allowedRegulation.has(mark);
-    });
+    const name = normalizeSearchText(card.name);
+    const compactName = name.replace(/\s+/g, "");
+    if (!searchTerms.every(term => name.includes(term) || compactName.includes(term))) {
+      return false;
+    }
+    if (!standardOnly) {
+      return true;
+    }
+    const mark = String(card.regulationMark || "").toUpperCase();
+    return allowedRegulation.has(mark);
+  });
 }
 
 function getDeckSearchResultLimit() {
@@ -704,55 +704,55 @@ function parseDeck(text) {
   }
 
   lines.forEach(line => {
-      if (totalCardsPattern.test(line)) return;
+    if (totalCardsPattern.test(line)) return;
 
-      if (sectionHeaderPattern.test(line)) {
-        sections.hasHeaders = true;
-        const sectionName = line.match(sectionNamePattern)[1].toLowerCase();
+    if (sectionHeaderPattern.test(line)) {
+      sections.hasHeaders = true;
+      const sectionName = line.match(sectionNamePattern)[1].toLowerCase();
 
-        if (sectionName.includes("energy")) currentSection = "energy";
-        else if (sectionName.includes("trainer")) currentSection = "trainer";
-        else currentSection = "pokemon";
+      if (sectionName.includes("energy")) currentSection = "energy";
+      else if (sectionName.includes("trainer")) currentSection = "trainer";
+      else currentSection = "pokemon";
 
-        sections.seenSections[currentSection] = true;
-        return;
-      }
+      sections.seenSections[currentSection] = true;
+      return;
+    }
 
-      const setMatch = line.match(cardWithSetPattern);
-      if (setMatch && Number(setMatch[1]) <= 60) {
-        sections[currentSection].push({
-          qty: Number(setMatch[1]),
-          qtyText: setMatch[1],
-          name: setMatch[2].trim(),
-          setCode: setMatch[3] + " " + setMatch[4],
-          setAbbrev: setMatch[3],
-          setNumber: setMatch[4]
-        });
-        return;
-      }
-
-      const basicMatch = line.match(basicCardPattern);
-      if (basicMatch && Number(basicMatch[1]) <= 60) {
-        sections[currentSection].push({
-          qty: Number(basicMatch[1]),
-          qtyText: basicMatch[1],
-          name: basicMatch[2].trim(),
-          setCode: "",
-          setAbbrev: "",
-          setNumber: ""
-        });
-        return;
-      }
-
+    const setMatch = line.match(cardWithSetPattern);
+    if (setMatch && Number(setMatch[1]) <= 60) {
       sections[currentSection].push({
-        qty: 1,
-        qtyText: "1",
-        name: line,
+        qty: Number(setMatch[1]),
+        qtyText: setMatch[1],
+        name: setMatch[2].trim(),
+        setCode: setMatch[3] + " " + setMatch[4],
+        setAbbrev: setMatch[3],
+        setNumber: setMatch[4]
+      });
+      return;
+    }
+
+    const basicMatch = line.match(basicCardPattern);
+    if (basicMatch && Number(basicMatch[1]) <= 60) {
+      sections[currentSection].push({
+        qty: Number(basicMatch[1]),
+        qtyText: basicMatch[1],
+        name: basicMatch[2].trim(),
         setCode: "",
         setAbbrev: "",
         setNumber: ""
       });
+      return;
+    }
+
+    sections[currentSection].push({
+      qty: 1,
+      qtyText: "1",
+      name: line,
+      setCode: "",
+      setAbbrev: "",
+      setNumber: ""
     });
+  });
 
   return sections;
 }
