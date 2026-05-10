@@ -685,6 +685,13 @@
       border-radius: 10px;
     }
 
+    .site-visits {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: lowercase;
+    }
+
     #printPage {
       position: relative;
       display: inline-block;

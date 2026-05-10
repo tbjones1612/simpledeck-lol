@@ -13,6 +13,7 @@ const deckInput = document.getElementById("deckInput");
 const asciiPreview = document.getElementById("asciiPreview");
 const warning = document.getElementById("warning");
 const totalDisplay = document.getElementById("total");
+const siteVisitsDisplay = document.getElementById("siteVisits");
 const borderCharInput = document.getElementById("borderChar");
 const paperWidthInput = document.getElementById("paperWidth");
 const columnsInput = document.getElementById("columns");
@@ -1407,6 +1408,35 @@ function resetControls() {
   updatePreview();
 }
 
+function getGoatCounterPath() {
+  if (window.goatcounter?.get_data) {
+    return window.goatcounter.get_data().p || "/";
+  }
+
+  return window.location.pathname || "/";
+}
+
+async function updateSiteVisits() {
+  if (!siteVisitsDisplay) {
+    return;
+  }
+
+  try {
+    const path = getGoatCounterPath();
+    const response = await fetch(`https://tbjones1612.goatcounter.com/counter/${encodeURIComponent(path)}.json`);
+
+    if (!response.ok) {
+      throw new Error(`GoatCounter returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    siteVisitsDisplay.textContent = `total site visits: ${data.count}`;
+  } catch (error) {
+    siteVisitsDisplay.textContent = "total site visits: unavailable";
+    console.warn("Unable to load GoatCounter visit count", error);
+  }
+}
+
 document.querySelectorAll("input, textarea, select").forEach(el => {
   el.addEventListener("input", updatePreview);
   el.addEventListener("change", updatePreview);
@@ -1524,3 +1554,4 @@ const cardDatabasePromise = loadCardDatabase().then(() => {
 updateFieldVisibility();
 updatePreviewBackground();
 updatePreview();
+updateSiteVisits();
