@@ -134,6 +134,36 @@ textarea {
   margin: 0;
 }
 
+.print-options {
+  display: block;
+  margin-top: 12px;
+}
+
+.print-options .checks-divider {
+  display: block;
+  width: 100%;
+  height: 0;
+  border-top: 1px dotted rgba(245, 245, 245, 0.60);
+  margin: 0 0 10px;
+}
+
+.print-options .option-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: var(--text);
+}
+
+.print-options .option-checkbox {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  padding: 0;
+}
+
 .buttons {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

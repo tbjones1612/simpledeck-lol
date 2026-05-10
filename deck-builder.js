@@ -5,6 +5,7 @@ async function loadCardDatabase() {
       throw new Error(`Unable to load card data: ${response.status}`);
     }
     cardDatabase = await response.json();
+    window.cardDatabase = cardDatabase;
     populateCardFilterOptions();
     cardDatabaseLoaded = true;
     cardDatabaseLoadFailed = false;
@@ -373,6 +374,12 @@ function formatDeckLine(entry) {
 
   if (type === "energy") {
     cardName = formatEnergyNameForDeckList(cardName);
+
+    if (isBasicEnergyCard(card)) {
+      return [entry.qty, cardName].filter(Boolean).join(" ");
+    }
+
+    return [entry.qty, cardName, setCode, number].filter(Boolean).join(" ");
   }
 
   return [
@@ -520,6 +527,19 @@ function findCardInDatabase(parsedCard) {
 
     if (setNumberMatch) {
       return setNumberMatch;
+    }
+  }
+
+  if (parsedSet) {
+    const setNameMatch = cardDatabase.find(card => {
+      const cardSets = getNormalizedSetCodes(card);
+
+      return cardSets.includes(parsedSet) &&
+        normalizeDeckCardName(card.name) === parsedName;
+    });
+
+    if (setNameMatch) {
+      return setNameMatch;
     }
   }
 

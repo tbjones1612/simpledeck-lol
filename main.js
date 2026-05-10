@@ -46,6 +46,7 @@ let previewBgMode = "color";
 let previewStyle = "default";
 
 let cardDatabase = [];
+window.cardDatabase = cardDatabase;
 let deckBuilderDeck = [];
 let cardDatabaseLoaded = false;
 let cardDatabaseLoadFailed = false;
@@ -168,6 +169,8 @@ const cardDatabasePromise = loadCardDatabase().then(() => {
     renderDeckSearchResults(searchDeckCards(deckSearchInput.value));
     renderDeckList();
   }
+
+  updatePreview();
 });
 updateFieldVisibility();
 updatePreviewBackground();

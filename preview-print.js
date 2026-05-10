@@ -23,6 +23,7 @@ function parseDeck(text) {
   const sectionNamePattern = new RegExp("^ *(pok[eé]mon|pokemon|trainer|trainers|energy) *:", "i");
   const totalCardsPattern = new RegExp("^ *total +cards *: *[0-9]+ *$", "i");
   const cardWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z0-9]{2,6}) +([0-9]+) *$");
+  const energyWithSetPattern = new RegExp("^([0-9]+) +(.+?) +([A-Z0-9]{2,6}) *$");
   const basicCardPattern = new RegExp("^([0-9]+) +(.+)$");
   const rawQuantityPattern = new RegExp("^([0-9]+) +(.+)$");
 
@@ -116,6 +117,22 @@ function parseDeck(text) {
         setCode: setMatch[3] + " " + setMatch[4],
         setAbbrev: setMatch[3],
         setNumber: setMatch[4]
+      });
+      return;
+    }
+
+    const energySetMatch = currentSection === "energy"
+      ? line.match(energyWithSetPattern)
+      : null;
+
+    if (energySetMatch && Number(energySetMatch[1]) <= 60) {
+      sections[currentSection].push({
+        qty: Number(energySetMatch[1]),
+        qtyText: energySetMatch[1],
+        name: energySetMatch[2].trim(),
+        setCode: energySetMatch[3],
+        setAbbrev: energySetMatch[3],
+        setNumber: ""
       });
       return;
     }
@@ -220,6 +237,77 @@ function wrapWords(text, width) {
   return lines.length ? lines : [""];
 }
 
+function isBasicEnergyName(name) {
+  return /^basic (?:\{[A-Z]\}|[a-z]+) energy$/i.test(String(name || "").trim());
+}
+
+function getNormalizedDeckName(name) {
+  return String(name || "")
+    .replace(/\{G\}/gi, "Grass")
+    .replace(/\{R\}/gi, "Fire")
+    .replace(/\{W\}/gi, "Water")
+    .replace(/\{L\}/gi, "Lightning")
+    .replace(/\{P\}/gi, "Psychic")
+    .replace(/\{F\}/gi, "Fighting")
+    .replace(/\{D\}/gi, "Darkness")
+    .replace(/\{M\}/gi, "Metal")
+    .replace(/\{C\}/gi, "Colorless")
+    .replace(/\{Y\}/gi, "Fairy")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function getCardRegulationMark(card) {
+  const showRegulationMarks = document.getElementById("showRegulationMarks")?.checked;
+  const cards = Array.isArray(window.cardDatabase) ? window.cardDatabase : [];
+
+  if (!showRegulationMarks || !cards.length) {
+    return "";
+  }
+
+  const setAbbrev = String(card.setAbbrev || "").trim().toUpperCase();
+  const setNumber = String(card.setNumber || "").trim();
+
+  if (!setAbbrev || !setNumber) {
+    return "";
+  }
+
+  const normalizedName = getNormalizedDeckName(card.name);
+  const match = cards.find(databaseCard => {
+    const databaseSets = [
+      databaseCard.set?.ptcgoCode,
+      databaseCard.set?.id
+    ]
+      .filter(Boolean)
+      .map(code => String(code).trim().toUpperCase());
+
+    return databaseSets.includes(setAbbrev) &&
+      String(databaseCard.number || "").trim() === setNumber &&
+      getNormalizedDeckName(databaseCard.name) === normalizedName;
+  }) || cards.find(databaseCard => {
+    const databaseSets = [
+      databaseCard.set?.ptcgoCode,
+      databaseCard.set?.id
+    ]
+      .filter(Boolean)
+      .map(code => String(code).trim().toUpperCase());
+
+    return databaseSets.includes(setAbbrev) &&
+      String(databaseCard.number || "").trim() === setNumber;
+  });
+
+  return String(match?.regulationMark || "").trim().toUpperCase().slice(0, 1);
+}
+
+function appendRegulationMark(line, regulationMark, columnWidth) {
+  if (!regulationMark) {
+    return line;
+  }
+
+  return padRight(line, columnWidth - regulationMark.length) + regulationMark;
+}
+
 function makeSection(title, cards, columnWidth) {
   const lines = [];
 
@@ -236,51 +324,77 @@ function makeSection(title, cards, columnWidth) {
   cards.forEach(card => {
     const qtyPart = padRight(card.qtyText || card.qty, 3) + "  ";
     const continuationIndent = repeat(" ", qtyPart.length);
-    const setCode = card.setCode || "";
+    const section = title.toLowerCase();
+    const regulationMark = getCardRegulationMark(card);
+    const rowWidth = regulationMark ? columnWidth - regulationMark.length - 1 : columnWidth;
+    const setCode = section === "energy" && isBasicEnergyName(card.name)
+      ? ""
+      : section === "energy"
+        ? card.setAbbrev || ""
+        : card.setCode || "";
 
     if (setCode) {
-      const section = title.toLowerCase();
-
       if (section === "energy") {
-        const wrapped = wrapWords(card.name, columnWidth - qtyPart.length);
+        const firstLineNameWidth = rowWidth - qtyPart.length - setCode.length - 1;
+        const wrapped = wrapWords(card.name, firstLineNameWidth);
 
-        lines.push(qtyPart + padRight(wrapped[0], columnWidth - qtyPart.length));
+        lines.push(appendRegulationMark(
+          qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode,
+          regulationMark,
+          columnWidth
+        ));
 
         wrapped.slice(1).forEach(extraLine => {
           lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
         });
       } else if (section === "trainer") {
-        const firstLineNameWidth = columnWidth - qtyPart.length - card.setAbbrev.length - 1;
+        const firstLineNameWidth = rowWidth - qtyPart.length - card.setAbbrev.length - 1;
         const wrapped = wrapWords(card.name, firstLineNameWidth);
 
-        lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + card.setAbbrev);
+        lines.push(appendRegulationMark(
+          qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + card.setAbbrev,
+          regulationMark,
+          columnWidth
+        ));
 
         wrapped.slice(1).forEach(extraLine => {
           lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
         });
       } else if (section === "pokemon" && card.setNumber) {
-        const firstLineNameWidth = columnWidth - qtyPart.length - setCode.length - 1;
+        const firstLineNameWidth = rowWidth - qtyPart.length - setCode.length - 1;
         const wrapped = wrapWords(card.name, firstLineNameWidth);
 
-        lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode);
+        lines.push(appendRegulationMark(
+          qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode,
+          regulationMark,
+          columnWidth
+        ));
 
         wrapped.slice(1).forEach(extraLine => {
           lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
         });
       } else {
-        const firstLineNameWidth = columnWidth - qtyPart.length - setCode.length - 1;
+        const firstLineNameWidth = rowWidth - qtyPart.length - setCode.length - 1;
         const wrapped = wrapWords(card.name, firstLineNameWidth);
 
-        lines.push(qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode);
+        lines.push(appendRegulationMark(
+          qtyPart + padRight(wrapped[0], firstLineNameWidth) + " " + setCode,
+          regulationMark,
+          columnWidth
+        ));
 
         wrapped.slice(1).forEach(extraLine => {
           lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
         });
       }
     } else {
-      const wrapped = wrapWords(card.name, columnWidth - qtyPart.length);
+      const wrapped = wrapWords(card.name, rowWidth - qtyPart.length);
 
-      lines.push(qtyPart + padRight(wrapped[0], columnWidth - qtyPart.length));
+      lines.push(appendRegulationMark(
+        qtyPart + padRight(wrapped[0], rowWidth - qtyPart.length),
+        regulationMark,
+        columnWidth
+      ));
 
       wrapped.slice(1).forEach(extraLine => {
         lines.push(continuationIndent + padRight(extraLine, columnWidth - continuationIndent.length));
